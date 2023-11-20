@@ -7,7 +7,7 @@ public partial class Task
 {
     public int Taskid { get; set; }
 
-    public string Name { get; set; }
+    public string? Name { get; set; }
 
     public int? Tasktypeid { get; set; }
 
@@ -15,5 +15,5 @@ public partial class Task
 
     public sbyte? Iscompleted { get; set; }
 
-    public virtual Tasktype Tasktype { get; set; }
+    public virtual Tasktype? Tasktype { get; set; }
 }

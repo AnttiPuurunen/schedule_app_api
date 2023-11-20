@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using ScheduleAppApi.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace ScheduleAppApi.Controllers;
 
@@ -17,8 +18,20 @@ public class TaskController : ControllerBase
     }
 
     [HttpGet]
-    public IEnumerable<ScheduleAppApi.Models.Task> Get()
+    [Produces("application/json")]
+    public async Task<ActionResult<IEnumerable<Models.Task>>> Get()
     {
-        return _scheduleContext.Tasks.ToList();
+        List<Models.Task> Tasks = _scheduleContext.Tasks.ToList();
+
+        var items = await _scheduleContext.Tasks.Include(x => x.Tasktype)
+                                .OrderBy(x => x.Duedate)
+                                .ToListAsync();
+
+        if (items.Count == 0 || items == null)
+            {
+                return NotFound();
+            }
+
+        return Ok(items);
     }
 }
