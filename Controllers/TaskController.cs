@@ -57,7 +57,7 @@ public class TaskController : ControllerBase
         return Ok(items);
     }
 
-    // POST: api/task
+    // POST: api/task/
     // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
     [HttpPost]
     [ActionName(nameof(Models.Task))]
@@ -86,5 +86,42 @@ public class TaskController : ControllerBase
         }
 
         return CreatedAtAction(nameof(Models.Task), new { Id = itemCreate.Taskid }, itemCreate);
+    }
+
+    // PUT: api/task/{id}
+    // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+    [HttpPut("{id}")]
+    [ActionName(nameof(Models.Task))]
+    public async Task<IActionResult> ChangeTaskCompletion(long id, [FromBody] Models.Task item)
+    {
+        if (id != item.Taskid)
+        {
+            return BadRequest();
+        }
+
+        _scheduleContext.Entry(item).State = EntityState.Modified;
+
+        try
+        {
+            await _scheduleContext.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!TaskItemExists(id))
+            {
+                return NotFound();
+            }
+            else
+            {
+                throw;
+            }
+        }
+
+        return NoContent();
+    }
+
+    private bool TaskItemExists(long id)
+    {
+        return _scheduleContext.Tasks.Any(e => e.Taskid == id);
     }
 }
